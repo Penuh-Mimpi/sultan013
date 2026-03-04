@@ -18,27 +18,27 @@ import math
 # ═══════════════════════════════════════════════════════════
 
 WARNA = {
-    "bg_utama": "#1e1e2e",  # Latar belakang utama (gelap)
-    "bg_layar": "#181825",  # Latar belakang layar
-    "teks_utama": "#cdd6f4",  # Warna teks utama
-    "teks_redup": "#6c7086",  # Warna teks redup (ekspresi)
-    "teks_hasil": "#a6e3a1",  # Warna teks hasil
-    "tombol_angka": "#313244",  # Tombol angka
+    "bg_utama": "#1e1e2e",  
+    "bg_layar": "#181825",  
+    "teks_utama": "#cdd6f4",  
+    "teks_redup": "#6c7086",  
+    "teks_hasil": "#a6e3a1",  
+    "tombol_angka": "#313244", 
     "tombol_angka_hover": "#45475a",
-    "tombol_operator": "#585b70",  # Tombol operator
+    "tombol_operator": "#585b70", 
     "tombol_operator_hover": "#6c7086",
-    "tombol_sama_dengan": "#a6e3a1",  # Tombol =
+    "tombol_sama_dengan": "#a6e3a1", 
     "tombol_sama_dengan_hover": "#94e2d5",
     "teks_sama_dengan": "#1e1e2e",
-    "tombol_hapus": "#f38ba8",  # Tombol C / CE
+    "tombol_hapus": "#f38ba8", 
     "tombol_hapus_hover": "#eba0ac",
     "teks_hapus": "#1e1e2e",
-    "tombol_fungsi": "#fab387",  # Tombol fungsi (%, √, dll)
+    "tombol_fungsi": "#fab387", 
     "tombol_fungsi_hover": "#f9e2af",
     "teks_fungsi": "#1e1e2e",
-    "aksen": "#cba6f7",  # Warna aksen (tab aktif)
-    "bg_tab": "#11111b",  # Background tab area
-    "border": "#45475a",  # Warna border
+    "aksen": "#cba6f7",  
+    "bg_tab": "#11111b",  
+    "border": "#45475a",  
 }
 
 FONT_LAYAR_BESAR = ("Segoe UI", 32, "bold")
@@ -155,7 +155,6 @@ class TombolKustom(tk.Canvas):
 
     def _on_tekan(self, event):
         self._aktif = True
-        # Efek tekan: sedikit lebih gelap
         self._gambar(self.warna_bg)
 
     def _on_lepas(self, event):
@@ -178,37 +177,23 @@ class AplikasiKalkulator:
         self.root.resizable(False, False)
         self.root.configure(bg=WARNA["bg_utama"])
 
-        # Coba set ikon (opsional)
         try:
             self.root.iconbitmap(default="")
         except Exception:
             pass
 
-        # Variabel kalkulator
         self.ekspresi = ""
         self.hasil_terakhir = ""
         self.baru_mulai = True
-
-        # ── Setup Style ──
         self._setup_style()
-
-        # ── Notebook (Tab) ──
         self.notebook = ttk.Notebook(self.root, style="Custom.TNotebook")
         self.notebook.pack(fill=tk.BOTH, expand=True, padx=0, pady=0)
-
-        # Tab Kalkulator
         self.tab_kalkulator = tk.Frame(self.notebook, bg=WARNA["bg_utama"])
         self.notebook.add(self.tab_kalkulator, text="  Kalkulator  ")
-
-        # Tab Konversi Suhu
         self.tab_suhu = tk.Frame(self.notebook, bg=WARNA["bg_utama"])
         self.notebook.add(self.tab_suhu, text="  Konversi Suhu  ")
-
-        # Bangun semua tab
         self._bangun_tab_kalkulator()
         self._bangun_tab_suhu()
-
-        # Keyboard binding
         self.root.bind("<Key>", self._handle_keyboard)
 
     # ───────────────────────────────────────────────────────
@@ -218,8 +203,6 @@ class AplikasiKalkulator:
     def _setup_style(self):
         style = ttk.Style()
         style.theme_use("clam")
-
-        # Notebook
         style.configure(
             "Custom.TNotebook",
             background=WARNA["bg_utama"],
@@ -240,8 +223,6 @@ class AplikasiKalkulator:
             foreground=[("selected", WARNA["aksen"])],
             expand=[("selected", [0, 0, 0, 2])],
         )
-
-        # Combobox
         style.configure(
             "Custom.TCombobox",
             fieldbackground=WARNA["tombol_angka"],
@@ -263,12 +244,8 @@ class AplikasiKalkulator:
 
     def _bangun_tab_kalkulator(self):
         frame = self.tab_kalkulator
-
-        # ── Layar ──
         frame_layar = tk.Frame(frame, bg=WARNA["bg_layar"], padx=20, pady=10)
         frame_layar.pack(fill=tk.X, padx=10, pady=(10, 5))
-
-        # Label ekspresi (kecil, di atas)
         self.var_ekspresi = tk.StringVar(value="")
         self.label_ekspresi = tk.Label(
             frame_layar,
@@ -279,8 +256,6 @@ class AplikasiKalkulator:
             anchor="e",
         )
         self.label_ekspresi.pack(fill=tk.X, anchor="e")
-
-        # Label hasil (besar)
         self.var_hasil = tk.StringVar(value="0")
         self.label_hasil = tk.Label(
             frame_layar,
@@ -291,13 +266,9 @@ class AplikasiKalkulator:
             anchor="e",
         )
         self.label_hasil.pack(fill=tk.X, anchor="e")
-
-        # ── Tombol ──
         frame_tombol = tk.Frame(frame, bg=WARNA["bg_utama"])
         frame_tombol.pack(fill=tk.BOTH, expand=True, padx=8, pady=5)
-
-        # Definisi tombol: (teks, tipe)
-        # Tipe: "angka", "operator", "fungsi", "hapus", "sama_dengan"
+        
         baris_tombol = [
             [("C", "hapus"), ("⌫", "hapus"), ("%", "fungsi"), ("÷", "operator")],
             [("7", "angka"), ("8", "angka"), ("9", "angka"), ("×", "operator")],
@@ -387,7 +358,6 @@ class AplikasiKalkulator:
                     )
                     self.var_hasil.set(self.ekspresi)
                 except ValueError:
-                    # Jika ekspresi kompleks, tambahkan tanda minus di depan
                     if self.ekspresi.startswith("-"):
                         self.ekspresi = self.ekspresi[1:]
                     else:
@@ -409,7 +379,6 @@ class AplikasiKalkulator:
         if teks == "=":
             if self.ekspresi:
                 try:
-                    # Ganti simbol Unicode ke operator Python
                     ekspresi_eval = self.ekspresi
                     ekspresi_eval = ekspresi_eval.replace("×", "*")
                     ekspresi_eval = ekspresi_eval.replace("÷", "/")
@@ -417,7 +386,6 @@ class AplikasiKalkulator:
 
                     hasil = eval(ekspresi_eval)
 
-                    # Format hasil
                     if isinstance(hasil, float):
                         if hasil == int(hasil) and abs(hasil) < 1e15:
                             hasil_str = str(int(hasil))
@@ -426,7 +394,6 @@ class AplikasiKalkulator:
                     else:
                         hasil_str = str(hasil)
 
-                    # Tampilkan hasil
                     ekspresi_tampil = self.ekspresi
                     self.var_ekspresi.set(f"{ekspresi_tampil} =")
                     self.var_hasil.set(hasil_str)
@@ -445,7 +412,6 @@ class AplikasiKalkulator:
                     self.baru_mulai = True
             return
 
-        # ── Input angka / operator ──
         operator_set = {"+", "−", "×", "÷"}
 
         if teks in operator_set:
@@ -456,7 +422,6 @@ class AplikasiKalkulator:
             self.ekspresi += teks
             self.var_hasil.set(self.ekspresi)
         else:
-            # Angka / titik desimal
             if self.baru_mulai and teks not in (".",):
                 if self.ekspresi and not any(
                     self.ekspresi.endswith(op) for op in operator_set
@@ -464,9 +429,7 @@ class AplikasiKalkulator:
                     self.ekspresi = ""
                 self.baru_mulai = False
 
-            # Cegah titik desimal ganda
             if teks == ".":
-                # Ambil angka terakhir
                 bagian = self.ekspresi
                 for op in operator_set:
                     bagian = bagian.replace(op, "|")
@@ -479,7 +442,6 @@ class AplikasiKalkulator:
 
     def _handle_keyboard(self, event):
         """Handler keyboard untuk kalkulator."""
-        # Hanya aktif jika tab kalkulator yang terpilih
         if self.notebook.index("current") != 0:
             return
 
@@ -521,8 +483,6 @@ class AplikasiKalkulator:
 
     def _bangun_tab_suhu(self):
         frame = self.tab_suhu
-
-        # ── Header ──
         header = tk.Label(
             frame,
             text="Konversi Suhu",
@@ -540,12 +500,8 @@ class AplikasiKalkulator:
             bg=WARNA["bg_utama"],
         )
         sub_header.pack(pady=(0, 15))
-
-        # ── Frame Input ──
         frame_input = tk.Frame(frame, bg=WARNA["bg_utama"])
         frame_input.pack(fill=tk.X, padx=24, pady=5)
-
-        # Baris atas: Label "Dari" + Combobox satuan
         frame_dari_atas = tk.Frame(frame_input, bg=WARNA["bg_utama"])
         frame_dari_atas.pack(fill=tk.X, pady=(0, 4))
 
@@ -568,8 +524,6 @@ class AplikasiKalkulator:
             style="Custom.TCombobox",
         )
         self.combo_dari.pack(side=tk.RIGHT, ipady=5)
-
-        # Baris bawah: Entry nilai
         self.var_suhu_input = tk.StringVar(value="0")
         self.entry_suhu = tk.Entry(
             frame_input,
@@ -583,8 +537,7 @@ class AplikasiKalkulator:
             justify="center",
         )
         self.entry_suhu.pack(fill=tk.X, ipady=10, pady=(0, 6))
-
-        # Tombol Konversi
+        
         frame_btn = tk.Frame(frame, bg=WARNA["bg_utama"])
         frame_btn.pack(pady=10)
 
@@ -600,8 +553,6 @@ class AplikasiKalkulator:
             command=self._konversi_suhu,
         )
         tombol_konversi.pack()
-
-        # ── Tombol Tukar ──
         frame_tukar = tk.Frame(frame, bg=WARNA["bg_utama"])
         frame_tukar.pack(pady=(5, 5))
 
@@ -617,12 +568,9 @@ class AplikasiKalkulator:
             command=self._tukar_satuan,
         )
         tombol_tukar.pack()
-
-        # Label "Ke"
+        
         frame_output = tk.Frame(frame, bg=WARNA["bg_utama"])
         frame_output.pack(fill=tk.X, padx=24, pady=5)
-
-        # Baris atas: Label "Ke" + Combobox satuan
         frame_ke_atas = tk.Frame(frame_output, bg=WARNA["bg_utama"])
         frame_ke_atas.pack(fill=tk.X, pady=(0, 4))
 
@@ -645,8 +593,6 @@ class AplikasiKalkulator:
             style="Custom.TCombobox",
         )
         self.combo_ke.pack(side=tk.RIGHT, ipady=5)
-
-        # Baris bawah: Entry hasil
         self.var_suhu_output = tk.StringVar(value="0")
         self.entry_suhu_output = tk.Entry(
             frame_output,
@@ -662,7 +608,6 @@ class AplikasiKalkulator:
         )
         self.entry_suhu_output.pack(fill=tk.X, ipady=10, pady=(0, 6))
 
-        # ── Tabel Referensi Cepat ──
         frame_ref = tk.Frame(frame, bg=WARNA["bg_layar"], padx=15, pady=10)
         frame_ref.pack(fill=tk.X, padx=30, pady=(15, 10))
 
@@ -700,7 +645,6 @@ class AplikasiKalkulator:
                 anchor="w",
             ).pack(side=tk.LEFT)
 
-        # Auto-konversi saat input berubah
         self.var_suhu_input.trace_add("write", lambda *a: self._konversi_suhu())
         self.var_satuan_dari.trace_add("write", lambda *a: self._konversi_suhu())
         self.var_satuan_ke.trace_add("write", lambda *a: self._konversi_suhu())
@@ -716,7 +660,6 @@ class AplikasiKalkulator:
         dari = self.var_satuan_dari.get()
         ke = self.var_satuan_ke.get()
 
-        # Langkah 1: Konversi ke Celsius terlebih dahulu
         if dari == "Celsius":
             celsius = nilai
         elif dari == "Fahrenheit":
@@ -729,7 +672,6 @@ class AplikasiKalkulator:
             self.var_suhu_output.set("—")
             return
 
-        # Langkah 2: Konversi dari Celsius ke satuan tujuan
         if ke == "Celsius":
             hasil = celsius
         elif ke == "Fahrenheit":
@@ -742,7 +684,6 @@ class AplikasiKalkulator:
             self.var_suhu_output.set("—")
             return
 
-        # Format hasil
         if hasil == int(hasil):
             self.var_suhu_output.set(str(int(hasil)))
         else:
