@@ -18,27 +18,27 @@ import math
 # ═══════════════════════════════════════════════════════════
 
 WARNA = {
-    "bg_utama": "#1e1e2e",  
-    "bg_layar": "#181825",  
-    "teks_utama": "#cdd6f4",  
-    "teks_redup": "#6c7086",  
-    "teks_hasil": "#a6e3a1",  
-    "tombol_angka": "#313244", 
+    "bg_utama": "#1e1e2e",
+    "bg_layar": "#181825",
+    "teks_utama": "#cdd6f4",
+    "teks_redup": "#6c7086",
+    "teks_hasil": "#a6e3a1",
+    "tombol_angka": "#313244",
     "tombol_angka_hover": "#45475a",
-    "tombol_operator": "#585b70", 
+    "tombol_operator": "#585b70",
     "tombol_operator_hover": "#6c7086",
-    "tombol_sama_dengan": "#a6e3a1", 
+    "tombol_sama_dengan": "#a6e3a1",
     "tombol_sama_dengan_hover": "#94e2d5",
     "teks_sama_dengan": "#1e1e2e",
-    "tombol_hapus": "#f38ba8", 
+    "tombol_hapus": "#f38ba8",
     "tombol_hapus_hover": "#eba0ac",
     "teks_hapus": "#1e1e2e",
-    "tombol_fungsi": "#fab387", 
+    "tombol_fungsi": "#fab387",
     "tombol_fungsi_hover": "#f9e2af",
     "teks_fungsi": "#1e1e2e",
-    "aksen": "#cba6f7",  
-    "bg_tab": "#11111b",  
-    "border": "#45475a",  
+    "aksen": "#cba6f7",
+    "bg_tab": "#11111b",
+    "border": "#45475a",
 }
 
 FONT_LAYAR_BESAR = ("Segoe UI", 32, "bold")
@@ -185,6 +185,9 @@ class AplikasiKalkulator:
         self.ekspresi = ""
         self.hasil_terakhir = ""
         self.baru_mulai = True
+        self.riwayat = []  # list of (ekspresi, hasil) tuples
+
+        # ── Setup Style ──
         self._setup_style()
         self.notebook = ttk.Notebook(self.root, style="Custom.TNotebook")
         self.notebook.pack(fill=tk.BOTH, expand=True, padx=0, pady=0)
@@ -192,8 +195,17 @@ class AplikasiKalkulator:
         self.notebook.add(self.tab_kalkulator, text="  Kalkulator  ")
         self.tab_suhu = tk.Frame(self.notebook, bg=WARNA["bg_utama"])
         self.notebook.add(self.tab_suhu, text="  Konversi Suhu  ")
+
+        # Tab Riwayat
+        self.tab_riwayat = tk.Frame(self.notebook, bg=WARNA["bg_utama"])
+        self.notebook.add(self.tab_riwayat, text="  Riwayat  ")
+
+        # Bangun semua tab
         self._bangun_tab_kalkulator()
         self._bangun_tab_suhu()
+        self._bangun_tab_riwayat()
+
+        # Keyboard binding
         self.root.bind("<Key>", self._handle_keyboard)
 
     # ───────────────────────────────────────────────────────
@@ -268,7 +280,7 @@ class AplikasiKalkulator:
         self.label_hasil.pack(fill=tk.X, anchor="e")
         frame_tombol = tk.Frame(frame, bg=WARNA["bg_utama"])
         frame_tombol.pack(fill=tk.BOTH, expand=True, padx=8, pady=5)
-        
+
         baris_tombol = [
             [("C", "hapus"), ("⌫", "hapus"), ("%", "fungsi"), ("÷", "operator")],
             [("7", "angka"), ("8", "angka"), ("9", "angka"), ("×", "operator")],
@@ -399,6 +411,7 @@ class AplikasiKalkulator:
                     self.var_hasil.set(hasil_str)
                     self.ekspresi = hasil_str
                     self.baru_mulai = True
+                    self._tambah_riwayat(ekspresi_tampil, hasil_str)
 
                 except ZeroDivisionError:
                     self.var_ekspresi.set(self.ekspresi + " =")
@@ -537,7 +550,7 @@ class AplikasiKalkulator:
             justify="center",
         )
         self.entry_suhu.pack(fill=tk.X, ipady=10, pady=(0, 6))
-        
+
         frame_btn = tk.Frame(frame, bg=WARNA["bg_utama"])
         frame_btn.pack(pady=10)
 
@@ -568,7 +581,7 @@ class AplikasiKalkulator:
             command=self._tukar_satuan,
         )
         tombol_tukar.pack()
-        
+
         frame_output = tk.Frame(frame, bg=WARNA["bg_utama"])
         frame_output.pack(fill=tk.X, padx=24, pady=5)
         frame_ke_atas = tk.Frame(frame_output, bg=WARNA["bg_utama"])
@@ -700,6 +713,175 @@ class AplikasiKalkulator:
         if output_lama and output_lama != "—":
             self.var_suhu_input.set(output_lama)
         self._konversi_suhu()
+
+    # ───────────────────────────────────────────────────────
+    #  TAB RIWAYAT
+    # ───────────────────────────────────────────────────────
+
+    def _bangun_tab_riwayat(self):
+        frame = self.tab_riwayat
+
+        # ── Header ──
+        frame_header = tk.Frame(frame, bg=WARNA["bg_utama"])
+        frame_header.pack(fill=tk.X, padx=15, pady=(15, 5))
+
+        tk.Label(
+            frame_header,
+            text="Riwayat Perhitungan",
+            font=("Segoe UI", 16, "bold"),
+            fg=WARNA["aksen"],
+            bg=WARNA["bg_utama"],
+        ).pack(side=tk.LEFT, anchor="w")
+
+        tombol_hapus_semua = TombolKustom(
+            frame_header,
+            teks="Hapus Semua",
+            warna_bg=WARNA["tombol_hapus"],
+            warna_hover=WARNA["tombol_hapus_hover"],
+            warna_teks=WARNA["teks_hapus"],
+            font=FONT_TOMBOL_KECIL,
+            lebar=115,
+            tinggi=36,
+            command=self._hapus_riwayat,
+        )
+        tombol_hapus_semua.pack(side=tk.RIGHT)
+
+        # Garis pemisah
+        tk.Frame(frame, bg=WARNA["border"], height=1).pack(
+            fill=tk.X, padx=15, pady=(5, 0)
+        )
+
+        # ── Area scroll ──
+        frame_scroll = tk.Frame(frame, bg=WARNA["bg_utama"])
+        frame_scroll.pack(fill=tk.BOTH, expand=True, padx=10, pady=5)
+
+        self.canvas_riwayat = tk.Canvas(
+            frame_scroll,
+            bg=WARNA["bg_utama"],
+            highlightthickness=0,
+            bd=0,
+        )
+        scrollbar_riwayat = tk.Scrollbar(
+            frame_scroll,
+            orient="vertical",
+            command=self.canvas_riwayat.yview,
+        )
+        self.canvas_riwayat.configure(yscrollcommand=scrollbar_riwayat.set)
+
+        scrollbar_riwayat.pack(side=tk.RIGHT, fill=tk.Y)
+        self.canvas_riwayat.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+
+        self.frame_isi_riwayat = tk.Frame(self.canvas_riwayat, bg=WARNA["bg_utama"])
+        self.canvas_window_id = self.canvas_riwayat.create_window(
+            (0, 0), window=self.frame_isi_riwayat, anchor="nw"
+        )
+
+        self.frame_isi_riwayat.bind("<Configure>", self._on_riwayat_configure)
+        self.canvas_riwayat.bind("<Configure>", self._on_canvas_configure)
+
+        # Scroll dengan mouse wheel
+        self.canvas_riwayat.bind(
+            "<MouseWheel>",
+            lambda e: self.canvas_riwayat.yview_scroll(-1 * (e.delta // 120), "units"),
+        )
+
+        # Pesan awal ketika kosong
+        self._refresh_riwayat()
+
+    def _on_riwayat_configure(self, event):
+        self.canvas_riwayat.configure(scrollregion=self.canvas_riwayat.bbox("all"))
+
+    def _on_canvas_configure(self, event):
+        self.canvas_riwayat.itemconfig(self.canvas_window_id, width=event.width)
+
+    def _tambah_riwayat(self, ekspresi, hasil):
+        """Simpan satu entri ke riwayat lalu perbarui tampilan."""
+        self.riwayat.append((ekspresi, hasil))
+        self._refresh_riwayat()
+
+    def _refresh_riwayat(self):
+        """Render ulang seluruh isi panel riwayat."""
+        for widget in self.frame_isi_riwayat.winfo_children():
+            widget.destroy()
+
+        if not self.riwayat:
+            tk.Label(
+                self.frame_isi_riwayat,
+                text="Belum ada riwayat perhitungan.",
+                font=FONT_LABEL,
+                fg=WARNA["teks_redup"],
+                bg=WARNA["bg_utama"],
+            ).pack(fill=tk.X, pady=30)
+            return
+
+        for ekspresi, hasil in reversed(self.riwayat):
+            self._buat_item_riwayat(ekspresi, hasil)
+
+    def _buat_item_riwayat(self, ekspresi, hasil):
+        """Buat satu kartu entri riwayat yang bisa diklik."""
+        frame_item = tk.Frame(
+            self.frame_isi_riwayat,
+            bg=WARNA["bg_layar"],
+            padx=14,
+            pady=10,
+            cursor="hand2",
+        )
+        frame_item.pack(fill=tk.X, padx=6, pady=3)
+
+        lbl_ekspresi = tk.Label(
+            frame_item,
+            text=ekspresi + "  =",
+            font=("Segoe UI", 11),
+            fg=WARNA["teks_redup"],
+            bg=WARNA["bg_layar"],
+            anchor="e",
+        )
+        lbl_ekspresi.pack(fill=tk.X)
+
+        lbl_hasil = tk.Label(
+            frame_item,
+            text=hasil,
+            font=("Segoe UI", 20, "bold"),
+            fg=WARNA["teks_hasil"],
+            bg=WARNA["bg_layar"],
+            anchor="e",
+        )
+        lbl_hasil.pack(fill=tk.X)
+
+        semua_widget = [frame_item, lbl_ekspresi, lbl_hasil]
+
+        def on_enter(e, fw=frame_item, le=lbl_ekspresi, lh=lbl_hasil):
+            fw.configure(bg=WARNA["tombol_angka"])
+            le.configure(bg=WARNA["tombol_angka"])
+            lh.configure(bg=WARNA["tombol_angka"])
+
+        def on_leave(e, fw=frame_item, le=lbl_ekspresi, lh=lbl_hasil):
+            fw.configure(bg=WARNA["bg_layar"])
+            le.configure(bg=WARNA["bg_layar"])
+            lh.configure(bg=WARNA["bg_layar"])
+
+        def on_click(e, h=hasil):
+            self.ekspresi = h
+            self.var_hasil.set(h)
+            self.var_ekspresi.set("")
+            self.baru_mulai = True
+            self.notebook.select(0)
+
+        for w in semua_widget:
+            w.bind("<Enter>", on_enter)
+            w.bind("<Leave>", on_leave)
+            w.bind("<Button-1>", on_click)
+            w.bind(
+                "<MouseWheel>",
+                lambda e: self.canvas_riwayat.yview_scroll(
+                    -1 * (e.delta // 120), "units"
+                ),
+            )
+
+    def _hapus_riwayat(self):
+        """Kosongkan seluruh riwayat."""
+        self.riwayat = []
+        self._refresh_riwayat()
 
 
 # ═══════════════════════════════════════════════════════════
