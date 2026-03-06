@@ -1,4 +1,5 @@
 """
+Sultan Trengginas
 Kalkulator GUI & Konversi Suhu
 ==============================
 Aplikasi kalkulator lengkap dengan antarmuka modern menggunakan Tkinter.
