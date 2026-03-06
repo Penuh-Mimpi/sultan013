@@ -19,16 +19,16 @@ import math
 # ═══════════════════════════════════════════════════════════
 
 WARNA = {
-    "bg_utama": "#1e1e2e",
-    "bg_layar": "#181825",
+    "bg_utama": "#0000ff",
+    "bg_layar": "#00FF40",
     "teks_utama": "#cdd6f4",
-    "teks_redup": "#6c7086",
+    "teks_redup": "#0026ff",
     "teks_hasil": "#a6e3a1",
     "tombol_angka": "#313244",
-    "tombol_angka_hover": "#45475a",
+    "tombol_angka_hover": "#02041f",
     "tombol_operator": "#585b70",
     "tombol_operator_hover": "#6c7086",
-    "tombol_sama_dengan": "#a6e3a1",
+    "tombol_sama_dengan": "#ff9100",
     "tombol_sama_dengan_hover": "#94e2d5",
     "teks_sama_dengan": "#1e1e2e",
     "tombol_hapus": "#f38ba8",
